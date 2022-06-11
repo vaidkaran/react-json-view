@@ -22,7 +22,7 @@ import {
 } from './DataTypes/DataTypes';
 
 //clibboard icon
-import { Edit, CheckCircle, RemoveCircle as Remove } from './icons';
+import { Edit, Verify, Verified, CheckCircle, RemoveCircle as Remove } from './icons';
 
 //theme
 import Theme from './../themes/getStyle';
@@ -34,11 +34,12 @@ class VariableEditor extends React.PureComponent {
             editMode: false,
             editValue: '',
             hovered: false,
+            verified: false,
             renameKey: false,
             parsedInput: {
                 type: false,
                 value: null
-            }
+            },
         };
     }
 
@@ -55,7 +56,8 @@ class VariableEditor extends React.PureComponent {
             onDelete,
             onSelect,
             displayArrayKey,
-            quotesOnKeys
+            quotesOnKeys,
+            enableVerifyIcon,
         } = this.props;
         const { editMode } = this.state;
         return (
@@ -129,6 +131,7 @@ class VariableEditor extends React.PureComponent {
                 >
                     {this.getValue(variable, editMode)}
                 </div>
+                {enableVerifyIcon ? (this.state.verified ? this.getVerifiedIcon() : this.getVerifyIcon()) : null}
                 {enableClipboard ? (
                     <CopyToClipboard
                         rowHovered={this.state.hovered}
@@ -147,6 +150,51 @@ class VariableEditor extends React.PureComponent {
             </div>
         );
     }
+
+    getVerifyIcon = () => {
+        const { variable, theme, namespace, verifiedDataRef } = this.props;
+
+        return (
+            <div
+                class="click-to-edit"
+                style={{
+                    verticalAlign: 'top',
+                    display: this.state.hovered ? 'inline-block' : 'none'
+                }}
+            >
+                <Verify
+                    onClick={() => {
+                        // console.log('---> ', verifiedDataRef.current);
+                        verifiedDataRef.current.push({namespace, variable});
+                        this.setState({ ...this.state, verified: true })
+                    }}
+                />
+            </div>
+        );
+    };
+
+    getVerifiedIcon = () => {
+        const { variable, theme, verifiedDataRef } = this.props;
+
+        return (
+            <div
+                class="click-to-action"
+                style={{
+                    verticalAlign: 'top',
+                    // display: this.state.hovered ? 'inline-block' : 'none'
+                    // show always
+                    display: 'inline-block'
+                }}
+            >
+                <Verified
+                    onClick={() => {
+                        verifiedDataRef.current.push({namespace, variable});
+                        this.setState({ ...this.state, verified: true })
+                    }}
+                />
+            </div>
+        );
+    };
 
     getEditIcon = () => {
         const { variable, theme } = this.props;

@@ -5,12 +5,19 @@ import CopyToClipboard from './CopyToClipboard';
 import { toType } from './../helpers/util';
 
 //icons
-import { RemoveCircle as Remove, AddCircle as Add } from './icons';
+import { Verify, Verified, RemoveCircle as Remove, AddCircle as Add } from './icons';
 
 //theme
 import Theme from './../themes/getStyle';
 
 export default class extends React.PureComponent {
+    constructor(props) {
+        super(props);
+        this.state = {
+            verified: false,
+        };
+    }
+
     getObjectSize = () => {
         const { size, theme, displayObjectSize } = this.props;
         if (displayObjectSize) {
@@ -114,8 +121,10 @@ export default class extends React.PureComponent {
             enableClipboard,
             src,
             namespace,
-            rowHovered
+            rowHovered,
+            enableVerifyIcon,
         } = this.props;
+            // console.log("🚀 ~ file: VariableMeta.js ~ line 119 ~ extends ~ namespace", namespace)
         return (
             <div
                 {...Theme(theme, 'object-meta-data')}
@@ -126,6 +135,7 @@ export default class extends React.PureComponent {
             >
                 {/* size badge display */}
                 {this.getObjectSize()}
+                {enableVerifyIcon ? (this.state.verified ? this.getVerifiedIcon(rowHovered) : this.getVerifyIcon(rowHovered)) : null}
                 {/* copy to clipboard icon */}
                 {enableClipboard ? (
                     <CopyToClipboard
@@ -137,6 +147,52 @@ export default class extends React.PureComponent {
                 {/* copy add/remove icons */}
                 {onAdd !== false ? this.getAddAttribute(rowHovered) : null}
                 {onDelete !== false ? this.getRemoveObject(rowHovered) : null}
+            </div>
+        );
+    };
+
+    getVerifyIcon = (rowHovered) => {
+        const { theme, namespace, verifiedDataRef } = this.props;
+
+        return (
+            <div
+                class="click-to-edit"
+                style={{
+                    verticalAlign: 'top',
+                    display: rowHovered ? 'inline-block' : 'none'
+                }}
+            >
+                <Verify
+                    onClick={() => {
+                        // console.log('---> ', verifiedDataRef.current);
+                        verifiedDataRef.current.push({namespace});
+                        this.setState({ ...this.state, verified: true })
+                        // console.log('clicked...')
+                    }}
+                />
+            </div>
+        );
+    };
+
+    getVerifiedIcon = (rowHovered) => {
+        const { variable, theme, verifiedDataRef } = this.props;
+
+        return (
+            <div
+                class="click-to-action"
+                style={{
+                    verticalAlign: 'top',
+                    // display: this.state.hovered ? 'inline-block' : 'none'
+                    // show always
+                    display: 'inline-block'
+                }}
+            >
+                <Verified
+                    onClick={() => {
+                        verifiedDataRef.current.push({namespace, variable});
+                        this.setState({ ...this.state, verified: true })
+                    }}
+                />
             </div>
         );
     };

@@ -15,9 +15,11 @@ import AttributeStore from './../../stores/ObjectAttributes';
 
 //icons
 import { CollapsedIcon, ExpandedIcon } from './../ToggleIcons';
+import { Verified } from '../icons';
 
 //theme
 import Theme from './../../themes/getStyle';
+import { Button } from '@mui/material';
 
 //increment 1 with each nested object & array
 const DEPTH_INCREMENT = 1;
@@ -30,7 +32,7 @@ class RjvObject extends React.PureComponent {
         const state = RjvObject.getState(props);
         this.state = {
             ...state,
-            prevProps: {}
+            prevProps: {},
         };
     }
 
@@ -260,8 +262,13 @@ class RjvObject extends React.PureComponent {
                 variable.name = parseInt(variable.name) + index_offset;
             }
             if (!variables.hasOwnProperty(name)) {
+                // TODO: remove comments
+                // console.log('---------_> returning')
                 return;
             } else if (variable.type === 'object') {
+                // console.log('*******variable type object****************')
+                // console.log(namespace.concat(variable))
+                // console.log('***********************')
                 elements.push(
                     <JsonObject
                         key={variable.name}
@@ -274,6 +281,9 @@ class RjvObject extends React.PureComponent {
                     />
                 );
             } else if (variable.type === 'array') {
+                // console.log('*******variable type array****************')
+                // console.log(namespace.concat(variable))
+                // console.log('***********************')
                 let ObjectComponent = JsonObject;
 
                 if (
@@ -296,8 +306,12 @@ class RjvObject extends React.PureComponent {
                     />
                 );
             } else {
+                // console.log('*******variable type Else****************')
+                // console.log(namespace.concat(variable))
+                // console.log('***********************')
                 elements.push(
                     <VariableEditor
+                        verifiedDataRef={props.verifiedDataRef}
                         key={variable.name + '_' + namespace}
                         variable={variable}
                         singleIndent={SINGLE_INDENT}
