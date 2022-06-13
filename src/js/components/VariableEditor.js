@@ -58,6 +58,7 @@ class VariableEditor extends React.PureComponent {
             displayArrayKey,
             quotesOnKeys,
             enableVerifyIcon,
+            verifiedParentPaths
         } = this.props;
         const { editMode } = this.state;
         return (
@@ -131,7 +132,8 @@ class VariableEditor extends React.PureComponent {
                 >
                     {this.getValue(variable, editMode)}
                 </div>
-                {enableVerifyIcon ? (this.state.verified ? this.getVerifiedIcon() : this.getVerifyIcon()) : null}
+                {enableVerifyIcon ? (this.isVerified() ? this.getVerifiedIcon() : this.getVerifyIcon()) : null}
+                {/* {enableVerifyIcon ? (this.state.verified ? this.getVerifiedIcon() : this.getVerifyIcon()) : null} */}
                 {enableClipboard ? (
                     <CopyToClipboard
                         rowHovered={this.state.hovered}
@@ -151,6 +153,19 @@ class VariableEditor extends React.PureComponent {
         );
     }
 
+    isVerified = () => {
+        const {verifiedParentPaths, namespace} = this.props;
+        const variablePath = namespace.join('.');
+        for (const verifiedParentPath of verifiedParentPaths) {
+            const position = variablePath.search(verifiedParentPath);
+            if(position === 0) { // parent path in the start
+                return true;
+            }
+        }
+        // if parent isn't selected, then return based on variable state
+        return this.state.verified;
+    }
+
     getVerifyIcon = () => {
         const { variable, theme, namespace, verifiedDataRef } = this.props;
 
@@ -165,7 +180,7 @@ class VariableEditor extends React.PureComponent {
                 <Verify
                     onClick={() => {
                         // console.log('---> ', verifiedDataRef.current);
-                        verifiedDataRef.current.push({namespace, variable});
+                        // verifiedDataRef.current.push({namespace, variable});
                         this.setState({ ...this.state, verified: true })
                     }}
                 />
@@ -174,7 +189,7 @@ class VariableEditor extends React.PureComponent {
     };
 
     getVerifiedIcon = () => {
-        const { variable, theme, verifiedDataRef } = this.props;
+        const { variable, theme, verifiedDataRef, namespace } = this.props;
 
         return (
             <div
@@ -188,8 +203,8 @@ class VariableEditor extends React.PureComponent {
             >
                 <Verified
                     onClick={() => {
-                        verifiedDataRef.current.push({namespace, variable});
-                        this.setState({ ...this.state, verified: true })
+                        // verifiedDataRef.current.push({namespace, variable});
+                        // this.setState({ ...this.state, verified: true })
                     }}
                 />
             </div>
@@ -211,7 +226,8 @@ class VariableEditor extends React.PureComponent {
                     class="click-to-edit-icon"
                     {...Theme(theme, 'editVarIcon')}
                     onClick={() => {
-                        this.prepopInput(variable);
+                        console.log('on edit: ', this.isVerified())
+                        // this.prepopInput(variable);
                     }}
                 />
             </div>

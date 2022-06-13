@@ -11,36 +11,36 @@ import JsonViewer from './../../src/js/index';
 
 //just a function to get an example JSON object
 function getExampleJson1() {
-return {
-    a: 1,
-    b: {
-        k: [
-            [
+    return {
+        a: 1,
+        b: {
+            k: [
                 [
-                    'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii'
+                    [
+                        'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii'
+                    ]
                 ]
-            ]
-        ],
-        1: 'one',
-        c: 3,
-        d: [
-            'x',
-            'y',
-            'z'
-        ],
-        e: [
-            {
-                x: 11
-            },
-            {
-                y: 22
-            },
-            {
-                z: 33
-            },
-        ],
-    },
-};
+            ],
+            1: 'one',
+            c: 3,
+            d: [
+                'x',
+                'y',
+                'z'
+            ],
+            e: [
+                {
+                    x: 11
+                },
+                {
+                    y: 22
+                },
+                {
+                    z: 33
+                },
+            ],
+        },
+    };
 }
 
 //render 2 different examples of the react-json-view component

@@ -135,7 +135,8 @@ export default class extends React.PureComponent {
             >
                 {/* size badge display */}
                 {this.getObjectSize()}
-                {enableVerifyIcon ? (this.state.verified ? this.getVerifiedIcon(rowHovered) : this.getVerifyIcon(rowHovered)) : null}
+                {enableVerifyIcon ? (this.isVerified() ? this.getVerifiedIcon(rowHovered) : this.getVerifyIcon(rowHovered)) : null}
+                {/* {enableVerifyIcon ? (this.state.verified ? this.getVerifiedIcon(rowHovered) : this.getVerifyIcon(rowHovered)) : null} */}
                 {/* copy to clipboard icon */}
                 {enableClipboard ? (
                     <CopyToClipboard
@@ -151,8 +152,21 @@ export default class extends React.PureComponent {
         );
     };
 
+    isVerified = () => {
+        const {verifiedParentPaths, namespace} = this.props;
+        const variablePath = namespace.join('.');
+        for (const verifiedParentPath of verifiedParentPaths) {
+            const position = variablePath.search(verifiedParentPath);
+            if(position === 0) { // parent path in the start
+                return true;
+            }
+        }
+        // if parent isn't selected, then return based on variable state
+        return this.state.verified;
+    }
+
     getVerifyIcon = (rowHovered) => {
-        const { theme, namespace, verifiedDataRef } = this.props;
+        const { theme, namespace, verifiedDataRef, updateVerifiedParentPaths } = this.props;
 
         return (
             <div
@@ -167,6 +181,7 @@ export default class extends React.PureComponent {
                         // console.log('---> ', verifiedDataRef.current);
                         verifiedDataRef.current.push({namespace});
                         this.setState({ ...this.state, verified: true })
+                        updateVerifiedParentPaths(namespace.join('.'))
                         // console.log('clicked...')
                     }}
                 />
