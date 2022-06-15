@@ -75,7 +75,7 @@ ReactDom.render(
             // }}
             displayObjectSize={true}
             // name={'dev-server'}
-            name={false}
+            name={'root'}
             enableClipboard={false}
             // enableClipboard={copy => {
             //     console.log('you copied to clipboard!', copy);

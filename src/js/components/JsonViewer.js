@@ -1,6 +1,8 @@
 import React from 'react';
 import JsonObject from './DataTypes/Object';
 import ArrayGroup from './ArrayGroup';
+import { Splitscreen } from '@mui/icons-material';
+import { isTheme } from '../helpers/util';
 
 export default class extends React.PureComponent {
     constructor(props) {
@@ -8,18 +10,44 @@ export default class extends React.PureComponent {
         this.state = {
             verifiedParentPaths: []
         }
+        this.verifiedDataRef = React.createRef();
+
+        /**
+         * Object with variablePath as key and {namespace, variable} as value
+         * example:
+         * 
+         * {
+         *   "root.b.e.2.z": {
+         *       "namespace": [
+         *           "root",
+         *           "b",
+         *           "e",
+         *           "2"
+         *       ],
+         *       "variable": {
+         *           "name": "z",
+         *           "value": 33,
+         *           "type": "integer"
+         *       }
+         *   }
+         * }
+         */
+        this.verifiedDataRef.current = {};
     }
 
-    updateVerifiedParentPaths = (path) => {
-        console.log('updateVerifiedParentPaths called with: ', path)
+    addToVerifiedParentPaths = (path) => {
         this.setState({verifiedParentPaths: [...this.state.verifiedParentPaths, path]})
     }
 
+    removeFromVerifiedParentPaths = (path) => {
+        const updatedVerifiedParentPaths = this.state.verifiedParentPaths.filter((item) => item !== path)
+        this.setState({verifiedParentPaths: updatedVerifiedParentPaths})
+    }
+
     render = () => {
-        this.verifiedDataRef = React.createRef();
-        this.verifiedDataRef.current = [];
         this.props.verifiedDataRef = this.verifiedDataRef;
-        this.props.updateVerifiedParentPaths = this.updateVerifiedParentPaths;
+        this.props.addToVerifiedParentPaths = this.addToVerifiedParentPaths;
+        this.props.removeFromVerifiedParentPaths = this.removeFromVerifiedParentPaths;
         this.props.verifiedParentPaths = this.state.verifiedParentPaths;
         const { props } = this;
         const namespace = [props.name];
@@ -34,7 +62,7 @@ export default class extends React.PureComponent {
         }
 
         const printVerifiedDataRef = () => {
-            console.log('-----> verifiedDataRef: ', this.verifiedDataRef.current);
+            console.log('verifiedDataRef: ', this.verifiedDataRef.current);
         }
 
         return (

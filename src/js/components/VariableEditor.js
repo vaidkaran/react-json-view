@@ -21,7 +21,7 @@ import {
     JsonUndefined
 } from './DataTypes/DataTypes';
 
-//clibboard icon
+//clipboard icon
 import { Edit, Verify, Verified, CheckCircle, RemoveCircle as Remove } from './icons';
 
 //theme
@@ -35,6 +35,7 @@ class VariableEditor extends React.PureComponent {
             editValue: '',
             hovered: false,
             verified: false,
+            overrideParentState: false,
             renameKey: false,
             parsedInput: {
                 type: false,
@@ -153,7 +154,34 @@ class VariableEditor extends React.PureComponent {
         );
     }
 
-    isVerified = () => {
+    getVariablePath = () => {
+        const {namespace, variable} = this.props;
+        return namespace.join('.') + '.' + variable.name;
+    }
+
+    addToVerifiedDataRef = () => {
+        const {namespace, variable, verifiedDataRef} = this.props;
+        const path = this.getVariablePath();
+        verifiedDataRef.current[path] = {namespace, variable};
+    }
+
+    removeFromVerifiedDataRef = () => {
+        const {verifiedDataRef} = this.props;
+        const path = this.getVariablePath();
+        delete verifiedDataRef.current[path];
+    }
+
+    setAsVerified = () => {
+        console.log(' setting Verified')
+        this.setState({ verified: true });
+    }
+
+    setAsUnverified = () => {
+        console.log(' setting unverified')
+        this.setState({ verified: false });
+    }
+
+    isParentSelected = () => {
         const {verifiedParentPaths, namespace} = this.props;
         const variablePath = namespace.join('.');
         for (const verifiedParentPath of verifiedParentPaths) {
@@ -162,13 +190,20 @@ class VariableEditor extends React.PureComponent {
                 return true;
             }
         }
+        return false;
+    }
+
+    isVerified = () => {
+        console.log('isVerified called')
+        if (!this.state.overrideParentState && this.isParentSelected()) {
+            return true;
+        }
         // if parent isn't selected, then return based on variable state
         return this.state.verified;
     }
 
     getVerifyIcon = () => {
-        const { variable, theme, namespace, verifiedDataRef } = this.props;
-
+        this.removeFromVerifiedDataRef();
         return (
             <div
                 class="click-to-edit"
@@ -179,9 +214,8 @@ class VariableEditor extends React.PureComponent {
             >
                 <Verify
                     onClick={() => {
-                        // console.log('---> ', verifiedDataRef.current);
-                        // verifiedDataRef.current.push({namespace, variable});
-                        this.setState({ ...this.state, verified: true })
+                        this.addToVerifiedDataRef();
+                        this.setAsVerified();
                     }}
                 />
             </div>
@@ -189,7 +223,11 @@ class VariableEditor extends React.PureComponent {
     };
 
     getVerifiedIcon = () => {
-        const { variable, theme, verifiedDataRef, namespace } = this.props;
+        console.log('loaded')
+        // TODO: this might be adding it back to the ref so it isn't deleting from verifiedDataRef
+        // if (this.state.verified) this.addToVerifiedDataRef();
+        // else this.removeFromVerifiedDataRef();
+        this.addToVerifiedDataRef();
 
         return (
             <div
@@ -203,8 +241,10 @@ class VariableEditor extends React.PureComponent {
             >
                 <Verified
                     onClick={() => {
-                        // verifiedDataRef.current.push({namespace, variable});
-                        // this.setState({ ...this.state, verified: true })
+                        console.log('clicked...')
+                        this.removeFromVerifiedDataRef();
+                        this.setAsUnverified();
+                        this.setState({ overrideParentState: true });
                     }}
                 />
             </div>
@@ -227,7 +267,7 @@ class VariableEditor extends React.PureComponent {
                     {...Theme(theme, 'editVarIcon')}
                     onClick={() => {
                         console.log('on edit: ', this.isVerified())
-                        // this.prepopInput(variable);
+                        this.prepopInput(variable);
                     }}
                 />
             </div>

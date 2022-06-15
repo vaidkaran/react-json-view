@@ -164,9 +164,9 @@ export default class extends React.PureComponent {
         // if parent isn't selected, then return based on variable state
         return this.state.verified;
     }
-
+    
     getVerifyIcon = (rowHovered) => {
-        const { theme, namespace, verifiedDataRef, updateVerifiedParentPaths } = this.props;
+        const { theme, namespace, verifiedDataRef, addToVerifiedParentPaths } = this.props;
 
         return (
             <div
@@ -178,11 +178,8 @@ export default class extends React.PureComponent {
             >
                 <Verify
                     onClick={() => {
-                        // console.log('---> ', verifiedDataRef.current);
-                        verifiedDataRef.current.push({namespace});
                         this.setState({ ...this.state, verified: true })
-                        updateVerifiedParentPaths(namespace.join('.'))
-                        // console.log('clicked...')
+                        addToVerifiedParentPaths(namespace.join('.'))
                     }}
                 />
             </div>
@@ -190,7 +187,7 @@ export default class extends React.PureComponent {
     };
 
     getVerifiedIcon = (rowHovered) => {
-        const { variable, theme, verifiedDataRef } = this.props;
+        const { variable, theme, verifiedDataRef, namespace, removeFromVerifiedParentPaths } = this.props;
 
         return (
             <div
@@ -204,8 +201,8 @@ export default class extends React.PureComponent {
             >
                 <Verified
                     onClick={() => {
-                        verifiedDataRef.current.push({namespace, variable});
-                        this.setState({ ...this.state, verified: true })
+                        this.setState({ ...this.state, verified: false })
+                        removeFromVerifiedParentPaths(namespace.join('.'))
                     }}
                 />
             </div>
