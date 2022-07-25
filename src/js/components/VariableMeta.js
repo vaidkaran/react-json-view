@@ -123,7 +123,13 @@ export default class extends React.PureComponent {
             namespace,
             rowHovered,
             enableVerifyIcon,
+            type,
         } = this.props;
+        // if (type == 'array') {
+        //     console.log('Array: ', namespace.join('.'))
+        // } else {
+        //     console.log('Object: ', namespace.join('.'))
+        // }
             // console.log("🚀 ~ file: VariableMeta.js ~ line 119 ~ extends ~ namespace", namespace)
         return (
             <div
@@ -136,7 +142,6 @@ export default class extends React.PureComponent {
                 {/* size badge display */}
                 {this.getObjectSize()}
                 {enableVerifyIcon ? (this.isVerified() ? this.getVerifiedIcon(rowHovered) : this.getVerifyIcon(rowHovered)) : null}
-                {/* {enableVerifyIcon ? (this.state.verified ? this.getVerifiedIcon(rowHovered) : this.getVerifyIcon(rowHovered)) : null} */}
                 {/* copy to clipboard icon */}
                 {enableClipboard ? (
                     <CopyToClipboard
@@ -152,22 +157,75 @@ export default class extends React.PureComponent {
         );
     };
 
+    setAsVerified = (explicit = false) => {
+        const { addToVerifiedParentPaths } = this.props;
+        const path = this.getPath();
+        const pathObject = {};
+        pathObject[path] = { explicit };
+        addToVerifiedParentPaths(pathObject);
+        this.setState({ verified: true });
+    }
+
+    setAsUnverified = () => {
+        const { removeFromVerifiedParentPaths } = this.props;
+        const path = this.getPath();
+        removeFromVerifiedParentPaths(path) // removing both addTo and removeFrom fixed the problem of icon not appearing
+        this.setState({ verified: false });
+    }
+
+    getPath = () => {
+        const {namespace} = this.props;
+        return namespace.join('.');
+    }
+
+    isChildSelected = () => {
+        const {verifiedData, isSubParentSelected} = this.props;
+        const path = this.getPath();
+        const childSelected = Object.keys(verifiedData).some((selectedVarPath) => selectedVarPath.match(new RegExp(`^${path}\..+`)));
+        return childSelected || isSubParentSelected(path);
+    }
+
+    // TODO: use this it set isVerified
+    // has the body of isParentSelected
+    // this should now use the new markAll icon
+    // isSetByParent = () => {
+    //     const {verifiedParentPaths, namespace} = this.props;
+    //     const path = namespace.join('.');
+    //     for (const verifiedParentPath of verifiedParentPaths) {
+    //         const match = path.match(new RegExp(`^${verifiedParentPath}\..+$`));
+    //         if(match) {
+    //             return true;
+    //         }
+    //     }
+    //     // if parent isn't selected, then return based on variable state
+    //     return false;
+    // }
+
     isVerified = () => {
-        const {verifiedParentPaths, namespace} = this.props;
-        const variablePath = namespace.join('.');
-        for (const verifiedParentPath of verifiedParentPaths) {
-            const position = variablePath.search(verifiedParentPath);
-            if(position === 0) { // parent path in the start
-                return true;
-            }
+        const {getSelfSelectionInfo, inClearState} = this.props;
+        if(this.state.verified && inClearState()) {
+            this.setAsUnverified();
+            return false;
+        }
+
+        const path = this.getPath();
+        const selected = getSelfSelectionInfo(path);
+
+        if (this.isChildSelected()
+        || (selected && selected.explicit)) { // TODO: add isSetByParent
+            this.setAsVerified();
+            return true;
+        }
+
+        if (selected && !selected.explicit) {
+            this.setAsUnverified();
+            return false;
         }
         // if parent isn't selected, then return based on variable state
         return this.state.verified;
     }
     
     getVerifyIcon = (rowHovered) => {
-        const { theme, namespace, verifiedDataRef, addToVerifiedParentPaths } = this.props;
-
         return (
             <div
                 class="click-to-edit"
@@ -178,8 +236,7 @@ export default class extends React.PureComponent {
             >
                 <Verify
                     onClick={() => {
-                        this.setState({ ...this.state, verified: true })
-                        addToVerifiedParentPaths(namespace.join('.'))
+                        this.setAsVerified(true);
                     }}
                 />
             </div>
@@ -187,7 +244,7 @@ export default class extends React.PureComponent {
     };
 
     getVerifiedIcon = (rowHovered) => {
-        const { variable, theme, verifiedDataRef, namespace, removeFromVerifiedParentPaths } = this.props;
+        const { variable, theme, namespace, removeFromVerifiedParentPaths } = this.props;
 
         return (
             <div
@@ -201,8 +258,8 @@ export default class extends React.PureComponent {
             >
                 <Verified
                     onClick={() => {
-                        this.setState({ ...this.state, verified: false })
-                        removeFromVerifiedParentPaths(namespace.join('.'))
+                        // TODO: if childSelected, consider showing a tool tip saying "you can't do this" or something on click
+                        if (!this.isChildSelected()) this.setAsUnverified();
                     }}
                 />
             </div>

@@ -35,7 +35,6 @@ class VariableEditor extends React.PureComponent {
             editValue: '',
             hovered: false,
             verified: false,
-            overrideParentState: false,
             renameKey: false,
             parsedInput: {
                 type: false,
@@ -59,9 +58,13 @@ class VariableEditor extends React.PureComponent {
             displayArrayKey,
             quotesOnKeys,
             enableVerifyIcon,
-            verifiedParentPaths
         } = this.props;
         const { editMode } = this.state;
+        // if (type == 'array') {
+        //     console.log('Array: ', namespace.join('.'))
+        // } else {
+        //     console.log('Object: ', namespace.join('.'))
+        // }
         return (
             <div
                 {...Theme(theme, 'objectKeyVal', {
@@ -159,51 +162,73 @@ class VariableEditor extends React.PureComponent {
         return namespace.join('.') + '.' + variable.name;
     }
 
-    addToVerifiedDataRef = () => {
-        const {namespace, variable, verifiedDataRef} = this.props;
+    addToVerifiedData = () => {
+        const {namespace, variable, addVerifiedData} = this.props;
         const path = this.getVariablePath();
-        verifiedDataRef.current[path] = {namespace, variable};
+        addVerifiedData(path, {namespace, variable});
     }
 
-    removeFromVerifiedDataRef = () => {
-        const {verifiedDataRef} = this.props;
+    removeFromVerifiedData = () => {
+        const {removeVerifiedData} = this.props;
         const path = this.getVariablePath();
-        delete verifiedDataRef.current[path];
+        removeVerifiedData(path);
     }
+
+    // removeAllRelatedParentPaths = () => {
+    //     const {verifiedParentPaths, removeVerifiedParentPaths} = this.props;
+    //     const path = this.getVariablePath();
+
+    //     // TODO: use filter function
+    //     const pathsToRemove = verifiedParentPaths.filter((verifiedParentPath) => {
+    //         const match = path.match(new RegExp(`^${verifiedParentPath}\..+$`));
+    //         if(!match) return true
+    //     })
+    //     removeVerifiedParentPaths(pathsToRemove);
+        
+    // }
 
     setAsVerified = () => {
-        console.log(' setting Verified')
         this.setState({ verified: true });
+        this.addToVerifiedData();
     }
 
     setAsUnverified = () => {
-        console.log(' setting unverified')
         this.setState({ verified: false });
+        this.removeFromVerifiedData();
+        // this.removeAllRelatedParentPaths();
     }
 
-    isParentSelected = () => {
-        const {verifiedParentPaths, namespace} = this.props;
-        const variablePath = namespace.join('.');
-        for (const verifiedParentPath of verifiedParentPaths) {
-            const position = variablePath.search(verifiedParentPath);
-            if(position === 0) { // parent path in the start
-                return true;
-            }
-        }
-        return false;
-    }
+    // change to isSelectedByParent
+    // isParentSelected = () => {
+    //     const {verifiedParentPaths, namespace} = this.props;
+    //     const variablePath = namespace.join('.');
+    //     for (const verifiedParentPath of verifiedParentPaths) {
+    //         const position = variablePath.search(verifiedParentPath);
+    //         if(position === 0) { // parent path in the start
+    //             return true;
+    //         }
+    //     }
+    //     return false;
+    // }
 
     isVerified = () => {
-        console.log('isVerified called')
-        if (!this.state.overrideParentState && this.isParentSelected()) {
-            return true;
+        // change to isSelectedByParent
+        // if (this.isParentSelected()) {
+        //     return true;
+        // }
+        const {inClearState} = this.props;
+        if(this.state.verified && inClearState()) {
+            this.setAsUnverified();
+            return false;
         }
+
         // if parent isn't selected, then return based on variable state
         return this.state.verified;
     }
 
     getVerifyIcon = () => {
-        this.removeFromVerifiedDataRef();
+        // this.removeFromVerifiedData();
+        // this.removeAllRelatedParentPaths();
         return (
             <div
                 class="click-to-edit"
@@ -214,7 +239,6 @@ class VariableEditor extends React.PureComponent {
             >
                 <Verify
                     onClick={() => {
-                        this.addToVerifiedDataRef();
                         this.setAsVerified();
                     }}
                 />
@@ -223,12 +247,6 @@ class VariableEditor extends React.PureComponent {
     };
 
     getVerifiedIcon = () => {
-        console.log('loaded')
-        // TODO: this might be adding it back to the ref so it isn't deleting from verifiedDataRef
-        // if (this.state.verified) this.addToVerifiedDataRef();
-        // else this.removeFromVerifiedDataRef();
-        this.addToVerifiedDataRef();
-
         return (
             <div
                 class="click-to-action"
@@ -241,10 +259,7 @@ class VariableEditor extends React.PureComponent {
             >
                 <Verified
                     onClick={() => {
-                        console.log('clicked...')
-                        this.removeFromVerifiedDataRef();
                         this.setAsUnverified();
-                        this.setState({ overrideParentState: true });
                     }}
                 />
             </div>
@@ -266,7 +281,6 @@ class VariableEditor extends React.PureComponent {
                     class="click-to-edit-icon"
                     {...Theme(theme, 'editVarIcon')}
                     onClick={() => {
-                        console.log('on edit: ', this.isVerified())
                         this.prepopInput(variable);
                     }}
                 />
