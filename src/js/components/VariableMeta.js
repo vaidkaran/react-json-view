@@ -18,6 +18,12 @@ export default class extends React.PureComponent {
         };
     }
 
+    componentDidMount = () => {
+        const { initParentPath } = this.props;
+        const path = this.getPath();
+        initParentPath(path, this.setState.bind(this));
+    }
+
     getObjectSize = () => {
         const { size, theme, displayObjectSize } = this.props;
         if (displayObjectSize) {
@@ -141,7 +147,7 @@ export default class extends React.PureComponent {
             >
                 {/* size badge display */}
                 {this.getObjectSize()}
-                {enableVerifyIcon ? (this.isVerified() ? this.getVerifiedIcon(rowHovered) : this.getVerifyIcon(rowHovered)) : null}
+                {enableVerifyIcon ? (this.state.verified ? this.getVerifiedIcon(rowHovered) : this.getVerifyIcon(rowHovered)) : null}
                 {/* copy to clipboard icon */}
                 {enableClipboard ? (
                     <CopyToClipboard
@@ -160,72 +166,23 @@ export default class extends React.PureComponent {
     setAsVerified = (explicit = false) => {
         const { addToVerifiedParentPaths } = this.props;
         const path = this.getPath();
-        const pathObject = {};
-        pathObject[path] = { explicit };
-        addToVerifiedParentPaths(pathObject);
-        this.setState({ verified: true });
+        addToVerifiedParentPaths(path, {explicit});
     }
 
     setAsUnverified = () => {
         const { removeFromVerifiedParentPaths } = this.props;
         const path = this.getPath();
         removeFromVerifiedParentPaths(path) // removing both addTo and removeFrom fixed the problem of icon not appearing
-        this.setState({ verified: false });
     }
 
     getPath = () => {
-        const {namespace} = this.props;
-        return namespace.join('.');
+        const {namespace, pathSeparator} = this.props;
+        return namespace.join(pathSeparator);
     }
 
-    isChildSelected = () => {
-        const {verifiedData, isSubParentSelected} = this.props;
-        const path = this.getPath();
-        const childSelected = Object.keys(verifiedData).some((selectedVarPath) => selectedVarPath.match(new RegExp(`^${path}\..+`)));
-        return childSelected || isSubParentSelected(path);
-    }
-
-    // TODO: use this it set isVerified
-    // has the body of isParentSelected
-    // this should now use the new markAll icon
-    // isSetByParent = () => {
-    //     const {verifiedParentPaths, namespace} = this.props;
-    //     const path = namespace.join('.');
-    //     for (const verifiedParentPath of verifiedParentPaths) {
-    //         const match = path.match(new RegExp(`^${verifiedParentPath}\..+$`));
-    //         if(match) {
-    //             return true;
-    //         }
-    //     }
-    //     // if parent isn't selected, then return based on variable state
-    //     return false;
-    // }
-
-    isVerified = () => {
-        const {getSelfSelectionInfo, inClearState} = this.props;
-        if(this.state.verified && inClearState()) {
-            this.setAsUnverified();
-            return false;
-        }
-
-        const path = this.getPath();
-        const selected = getSelfSelectionInfo(path);
-
-        if (this.isChildSelected()
-        || (selected && selected.explicit)) { // TODO: add isSetByParent
-            this.setAsVerified();
-            return true;
-        }
-
-        if (selected && !selected.explicit) {
-            this.setAsUnverified();
-            return false;
-        }
-        // if parent isn't selected, then return based on variable state
-        return this.state.verified;
-    }
-    
     getVerifyIcon = (rowHovered) => {
+        const { addToVerifiedParentPaths } = this.props;
+        const path = this.getPath();
         return (
             <div
                 class="click-to-edit"
@@ -244,7 +201,7 @@ export default class extends React.PureComponent {
     };
 
     getVerifiedIcon = (rowHovered) => {
-        const { variable, theme, namespace, removeFromVerifiedParentPaths } = this.props;
+        const { canBeRemovedFromVerifiedParentPaths } = this.props;
 
         return (
             <div
@@ -258,8 +215,12 @@ export default class extends React.PureComponent {
             >
                 <Verified
                     onClick={() => {
-                        // TODO: if childSelected, consider showing a tool tip saying "you can't do this" or something on click
-                        if (!this.isChildSelected()) this.setAsUnverified();
+                        const path = this.getPath();
+
+                        if(canBeRemovedFromVerifiedParentPaths(path)) {
+                            this.setAsUnverified();
+                        }
+                        // TODO: else consider showing a tool tip saying "you can't do this because..."
                     }}
                 />
             </div>

@@ -19,7 +19,6 @@ import { Verified } from '../icons';
 
 //theme
 import Theme from './../../themes/getStyle';
-import { Button } from '@mui/material';
 
 //increment 1 with each nested object & array
 const DEPTH_INCREMENT = 1;

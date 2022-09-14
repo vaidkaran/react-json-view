@@ -1,6 +1,5 @@
 import React from 'react';
-import VerifiedIcon from '@mui/icons-material/Verified';
-import VerifiedOutlinedIcon from '@mui/icons-material/VerifiedOutlined';
+import {MdVerified as VerifiedIcon, MdOutlineVerified as VerifiedOutlinedIcon} from 'react-icons/md';
 
 const DEFAULT_WIDTH = 24;
 const DEFAULT_HEIGHT = 24;

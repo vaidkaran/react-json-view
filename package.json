@@ -6,9 +6,7 @@
     "dependencies": {
         "@emotion/react": "^11.9.0",
         "@emotion/styled": "^11.8.1",
-        "@mui/core": "^5.0.0-alpha.54",
-        "@mui/icons-material": "^5.8.2",
-        "@mui/material": "^5.8.2",
+        "react-icons": "^4.4.0",
         "flux": "^4.0.1",
         "react-base16-styling": "^0.6.0",
         "react-lifecycles-compat": "^3.0.4",
@@ -58,7 +56,6 @@
     },
     "scripts": {
         "build": "NODE_ENV=production webpack --config webpack/webpack.config.js -p --display-error-details --progress --optimize-minimize",
-        "prebuild": "NODE_ENV=test npm run test:unit",
         "build:demo": "NODE_ENV=production webpack --config webpack/webpack.config-demo.js -p --display-error-details --progress --optimize-minimize",
         "dev": "BROWSER=none NODE_ENV=development webpack-dev-server --config webpack/webpack.config-dev.js",
         "modules:debug": "./docker/debug.sh",
