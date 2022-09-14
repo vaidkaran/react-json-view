@@ -2,7 +2,8 @@
 npm-debug.log
 
 /coverage
-/dist
+# commenting out dist to make it run when installed via github
+# /dist
 /debug
 /node_modules
 
