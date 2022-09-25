@@ -44,10 +44,10 @@ class VariableEditor extends React.PureComponent {
     }
 
     componentDidMount = () => {
-        const { initVariablePath } = this.props;
+        const { initVariablePath, variable } = this.props;
         const path = this.getVariablePath();
         const parentPath = this.getParentPath();
-        initVariablePath(path, parentPath, this.setState.bind(this));
+        initVariablePath(path, parentPath, variable, this.setState.bind(this));
     }
 
     render() {
