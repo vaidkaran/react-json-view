@@ -15,7 +15,6 @@ import AttributeStore from './../../stores/ObjectAttributes';
 
 //icons
 import { CollapsedIcon, ExpandedIcon } from './../ToggleIcons';
-import { Verified } from '../icons';
 
 //theme
 import Theme from './../../themes/getStyle';

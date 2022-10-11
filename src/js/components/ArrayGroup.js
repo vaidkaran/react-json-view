@@ -17,6 +17,7 @@ export default class extends React.PureComponent {
         this.state = {
             expanded: []
         };
+        props.arrayGroupSetState(this.setState.bind(this))
     }
 
     toggleCollapsed = i => {
