@@ -181,7 +181,7 @@ export default class extends React.PureComponent {
     }
 
     getVerifyIcon = (rowHovered) => {
-        const { addToVerifiedParentPaths } = this.props;
+        const { addToVerifiedParentPaths, VerifyIcon} = this.props;
         const path = this.getPath();
         return (
             <div
@@ -191,7 +191,7 @@ export default class extends React.PureComponent {
                     display: rowHovered ? 'inline-block' : 'none'
                 }}
             >
-                <Verify
+                <VerifyIcon
                     onClick={() => {
                         this.setAsVerified(true);
                     }}
@@ -201,8 +201,7 @@ export default class extends React.PureComponent {
     };
 
     getVerifiedIcon = (rowHovered) => {
-        const { canBeRemovedFromVerifiedParentPaths } = this.props;
-
+        const { canBeRemovedFromVerifiedParentPaths, VerifiedIcon } = this.props;
         return (
             <div
                 class="click-to-action"
@@ -213,7 +212,7 @@ export default class extends React.PureComponent {
                     display: 'inline-block'
                 }}
             >
-                <Verified
+                <VerifiedIcon
                     onClick={() => {
                         const path = this.getPath();
 

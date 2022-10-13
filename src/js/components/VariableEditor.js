@@ -196,6 +196,7 @@ class VariableEditor extends React.PureComponent {
     }
 
     getVerifyIcon = () => {
+        const {VerifyIcon} = this.props;
         return (
             <div
                 class="click-to-edit"
@@ -204,7 +205,7 @@ class VariableEditor extends React.PureComponent {
                     display: this.state.hovered ? 'inline-block' : 'none'
                 }}
             >
-                <Verify
+                <VerifyIcon
                     onClick={() => {
                         this.setAsVerified();
                     }}
@@ -214,6 +215,7 @@ class VariableEditor extends React.PureComponent {
     };
 
     getVerifiedIcon = () => {
+        const {VerifiedIcon} = this.props;
         return (
             <div
                 class="click-to-action"
@@ -224,7 +226,7 @@ class VariableEditor extends React.PureComponent {
                     display: 'inline-block'
                 }}
             >
-                <Verified
+                <VerifiedIcon
                     onClick={() => {
                         this.setAsUnverified();
                     }}
