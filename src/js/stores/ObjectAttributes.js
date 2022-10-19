@@ -6,11 +6,6 @@ import { toType } from './../helpers/util';
 class ObjectAttributes extends EventEmitter {
     objects = {};
 
-    // somehow reset store on file change
-    resetStore = () => {
-        console.log('resetting attribute store');
-        this.objects = {};
-    }
 
     set = (rjvId, name, key, value) => {
         if (this.objects[rjvId] === undefined) {
@@ -128,7 +123,6 @@ class ObjectAttributes extends EventEmitter {
     };
 }
 
-console.log('creating new store instance')
 const attributeStore = new ObjectAttributes();
 dispatcher.register(attributeStore.handleAction.bind(attributeStore));
 export default attributeStore;

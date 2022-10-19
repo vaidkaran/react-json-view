@@ -173,18 +173,6 @@ class VariableEditor extends React.PureComponent {
         return namespace.join(pathSeparator);
     }
 
-    addToVerifiedData = () => {
-        const {namespace, variable, addVerifiedData} = this.props;
-        const path = this.getVariablePath();
-        addVerifiedData(path, {namespace, variable});
-    }
-
-    removeFromVerifiedData = () => {
-        const {removeVerifiedData} = this.props;
-        const path = this.getVariablePath();
-        removeVerifiedData(path);
-    }
-
     setAsVerified = () => {
         const { addToVerifiedVariablePaths } = this.props;
         addToVerifiedVariablePaths(this.getVariablePath());

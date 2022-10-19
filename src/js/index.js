@@ -28,7 +28,6 @@ class ReactJsonView extends React.PureComponent {
             prevName: ReactJsonView.defaultProps.name,
             prevTheme: ReactJsonView.defaultProps.theme
         };
-        props.setAttributeStoreInstance(ObjectAttributes)
     }
 
     //reference id for this instance
