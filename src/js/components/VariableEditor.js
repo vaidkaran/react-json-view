@@ -1,7 +1,6 @@
 import React from 'react';
 import AutosizeTextarea from 'react-textarea-autosize';
 
-import { toType } from './../helpers/util';
 import dispatcher from './../helpers/dispatcher';
 import parseInput from './../helpers/parseInput';
 import stringifyVariable from './../helpers/stringifyVariable';
@@ -44,10 +43,10 @@ class VariableEditor extends React.PureComponent {
     }
 
     componentDidMount = () => {
-        const { initVariablePath, variable } = this.props;
+        const { variable, store, initVariablePaths } = this.props;
         const path = this.getVariablePath();
         const parentPath = this.getParentPath();
-        initVariablePath(path, parentPath, variable, this.setState.bind(this));
+        store.dispatch(initVariablePaths({path, parentPath, variable, setState: this.setState.bind(this)}));
     }
 
     render() {
@@ -174,13 +173,15 @@ class VariableEditor extends React.PureComponent {
     }
 
     setAsVerified = () => {
-        const { addToVerifiedVariablePaths } = this.props;
-        addToVerifiedVariablePaths(this.getVariablePath());
+        const { store, setVariableAsVerified } = this.props;
+        const path = this.getVariablePath();
+        store.dispatch(setVariableAsVerified({path}));
     }
 
     setAsUnverified = () => {
-        const { removeFromVerifiedVariablePaths } = this.props;
-        removeFromVerifiedVariablePaths(this.getVariablePath());
+        const { store, setVariableAsUnverified } = this.props;
+        const path = this.getVariablePath();
+        store.dispatch(setVariableAsUnverified({path}));
     }
 
     getVerifyIcon = () => {

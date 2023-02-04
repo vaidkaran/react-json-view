@@ -1,5 +1,4 @@
 import React from 'react';
-import dispatcher from './../helpers/dispatcher';
 
 import CopyToClipboard from './CopyToClipboard';
 import { toType } from './../helpers/util';
@@ -19,9 +18,9 @@ export default class extends React.PureComponent {
     }
 
     componentDidMount = () => {
-        const { initParentPath } = this.props;
+        const { initParentPaths, store } = this.props;
         const path = this.getPath();
-        initParentPath(path, this.setState.bind(this));
+        store.dispatch(initParentPaths({ path, setState: this.setState.bind(this)}))
     }
 
     getObjectSize = () => {
@@ -159,20 +158,21 @@ export default class extends React.PureComponent {
                 {/* copy add/remove icons */}
                 {onAdd !== false ? this.getAddAttribute(rowHovered) : null}
                 {onDelete !== false ? this.getRemoveObject(rowHovered) : null}
+                <button onClick={()=>{}}>thisButton</button>
             </div>
         );
     };
 
     setAsVerified = (explicit = false) => {
-        const { addToVerifiedParentPaths } = this.props;
+        const { setParentAsVerified, store } = this.props;
         const path = this.getPath();
-        addToVerifiedParentPaths(path, {explicit});
+        store.dispatch(setParentAsVerified({path, explicit}));
     }
 
     setAsUnverified = () => {
-        const { removeFromVerifiedParentPaths } = this.props;
+        const { setParentAsUnverified, store } = this.props;
         const path = this.getPath();
-        removeFromVerifiedParentPaths(path) // removing both addTo and removeFrom fixed the problem of icon not appearing
+        store.dispatch(setParentAsUnverified({path}));
     }
 
     getPath = () => {
@@ -181,7 +181,7 @@ export default class extends React.PureComponent {
     }
 
     getVerifyIcon = (rowHovered) => {
-        const { addToVerifiedParentPaths, VerifyIcon} = this.props;
+        const { VerifyIcon} = this.props;
         const path = this.getPath();
         return (
             <div
@@ -201,7 +201,17 @@ export default class extends React.PureComponent {
     };
 
     getVerifiedIcon = (rowHovered) => {
-        const { canBeRemovedFromVerifiedParentPaths, VerifiedIcon } = this.props;
+        const { store, VerifiedIcon, pathSeparator } = this.props;
+
+        const canBeRemovedFromVerifiedParentPaths = (path) => {
+            const { parentPaths, variablePaths } = store.getState().paths;
+            const verifiedParentPaths = Object.keys(parentPaths).filter((path) => parentPaths[path].verified);
+            const verifiedVariablePaths = Object.keys(variablePaths).filter((path) => variablePaths[path].verified);
+            const childPaths = [...verifiedParentPaths, ...verifiedVariablePaths];
+            const childAlreadySelected = childPaths.some((verifiedChildPath) => verifiedChildPath.match(new RegExp(`^${path}${pathSeparator}.+`)));
+
+            return !childAlreadySelected; // cannot be marked as unverified if child is selected
+        }
         return (
             <div
                 class="click-to-action"
@@ -215,7 +225,6 @@ export default class extends React.PureComponent {
                 <VerifiedIcon
                     onClick={() => {
                         const path = this.getPath();
-
                         if(canBeRemovedFromVerifiedParentPaths(path)) {
                             this.setAsUnverified();
                         }
