@@ -173,15 +173,17 @@ class VariableEditor extends React.PureComponent {
     }
 
     setAsVerified = () => {
-        const { store, setVariableAsVerified } = this.props;
+        const { store, setVariableAsVerified, setUnsetAsTest } = this.props;
         const path = this.getVariablePath();
         store.dispatch(setVariableAsVerified({path}));
+        store.dispatch(setUnsetAsTest());
     }
 
     setAsUnverified = () => {
-        const { store, setVariableAsUnverified } = this.props;
+        const { store, setVariableAsUnverified, setUnsetAsTest } = this.props;
         const path = this.getVariablePath();
         store.dispatch(setVariableAsUnverified({path}));
+        store.dispatch(setUnsetAsTest());
     }
 
     getVerifyIcon = () => {

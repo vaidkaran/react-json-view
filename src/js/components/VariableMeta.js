@@ -158,21 +158,22 @@ export default class extends React.PureComponent {
                 {/* copy add/remove icons */}
                 {onAdd !== false ? this.getAddAttribute(rowHovered) : null}
                 {onDelete !== false ? this.getRemoveObject(rowHovered) : null}
-                <button onClick={()=>{}}>thisButton</button>
             </div>
         );
     };
 
     setAsVerified = (explicit = false) => {
-        const { setParentAsVerified, store } = this.props;
+        const { setParentAsVerified, store, setUnsetAsTest } = this.props;
         const path = this.getPath();
         store.dispatch(setParentAsVerified({path, explicit}));
+        store.dispatch(setUnsetAsTest());
     }
 
     setAsUnverified = () => {
-        const { setParentAsUnverified, store } = this.props;
+        const { setParentAsUnverified, store, setUnsetAsTest } = this.props;
         const path = this.getPath();
         store.dispatch(setParentAsUnverified({path}));
+        store.dispatch(setUnsetAsTest());
     }
 
     getPath = () => {
@@ -201,17 +202,8 @@ export default class extends React.PureComponent {
     };
 
     getVerifiedIcon = (rowHovered) => {
-        const { store, VerifiedIcon, pathSeparator } = this.props;
-
-        const canBeRemovedFromVerifiedParentPaths = (path) => {
-            const { parentPaths, variablePaths } = store.getState().paths;
-            const verifiedParentPaths = Object.keys(parentPaths).filter((path) => parentPaths[path].verified);
-            const verifiedVariablePaths = Object.keys(variablePaths).filter((path) => variablePaths[path].verified);
-            const childPaths = [...verifiedParentPaths, ...verifiedVariablePaths];
-            const childAlreadySelected = childPaths.some((verifiedChildPath) => verifiedChildPath.match(new RegExp(`^${path}${pathSeparator}.+`)));
-
-            return !childAlreadySelected; // cannot be marked as unverified if child is selected
-        }
+        const { store, VerifiedIcon } = this.props;
+        const state = store.getState().reqData;
         return (
             <div
                 class="click-to-action"
@@ -225,9 +217,7 @@ export default class extends React.PureComponent {
                 <VerifiedIcon
                     onClick={() => {
                         const path = this.getPath();
-                        if(canBeRemovedFromVerifiedParentPaths(path)) {
-                            this.setAsUnverified();
-                        }
+                        this.setAsUnverified();
                         // TODO: else consider showing a tool tip saying "you can't do this because..."
                     }}
                 />
