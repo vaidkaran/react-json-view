@@ -34,6 +34,7 @@ class VariableEditor extends React.PureComponent {
             editValue: '',
             hovered: false,
             verified: false,
+            saved: false,
             renameKey: false,
             parsedInput: {
                 type: false,
@@ -64,6 +65,7 @@ class VariableEditor extends React.PureComponent {
             displayArrayKey,
             quotesOnKeys,
             enableVerifyIcon,
+            enableVarSaveIcon,
         } = this.props;
         const { editMode } = this.state;
         // if (type == 'array') {
@@ -143,6 +145,7 @@ class VariableEditor extends React.PureComponent {
                     {this.getValue(variable, editMode)}
                 </div>
                 {enableVerifyIcon ? (this.state.verified ? this.getVerifiedIcon() : this.getVerifyIcon()) : null}
+                {enableVarSaveIcon ? (this.state.saved ? this.getSavedIcon() : this.getSaveIcon()) : null}
                 {enableClipboard ? (
                     <CopyToClipboard
                         rowHovered={this.state.hovered}
@@ -153,7 +156,7 @@ class VariableEditor extends React.PureComponent {
                     />
                 ) : null}
                 {onEdit !== false && editMode == false
-                    ? this.getEditIcon()
+                    ? thIs.getEditIcon()
                     : null}
                 {onDelete !== false && editMode == false
                     ? this.getRemoveIcon()
@@ -184,6 +187,18 @@ class VariableEditor extends React.PureComponent {
         const path = this.getVariablePath();
         store.dispatch(setVariableAsUnverified({path}));
         store.dispatch(setUnsetAsTest());
+    }
+
+    setAsSaved = () => {
+        const { store, setVariableAsSaved } = this.props;
+        const path = this.getVariablePath();
+        store.dispatch(setVariableAsSaved({path}));
+    }
+
+    setAsUnsaved = () => {
+        const { store, setVariableAsUnsaved } = this.props;
+        const path = this.getVariablePath();
+        store.dispatch(setVariableAsUnsaved({path}));
     }
 
     getVerifyIcon = () => {
@@ -220,6 +235,48 @@ class VariableEditor extends React.PureComponent {
                 <VerifiedIcon
                     onClick={() => {
                         this.setAsUnverified();
+                    }}
+                />
+            </div>
+        );
+    };
+
+    getSaveIcon = () => {
+        const {SaveIcon} = this.props;
+        return (
+            <div
+                class="click-to-edit"
+                style={{
+                    verticalAlign: 'top',
+                    paddingLeft: '5px',
+                    display: this.state.hovered ? 'inline-block' : 'none',
+                    cursor: 'pointer',
+                }}
+            >
+                <SaveIcon
+                    onClick={() => {
+                        this.setAsSaved();
+                    }}
+                />
+            </div>
+        );
+    };
+
+    getSavedIcon = () => {
+        const {SavedIcon} = this.props;
+        return (
+            <div
+                class="click-to-edit"
+                style={{
+                    verticalAlign: 'top',
+                    paddingLeft: '5px',
+                    display: 'inline-block', // show always
+                    cursor: 'pointer',
+                }}
+            >
+                <SavedIcon
+                    onClick={() => {
+                        this.setAsUnsaved();
                     }}
                 />
             </div>
